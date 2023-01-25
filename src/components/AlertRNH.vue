@@ -1,19 +1,15 @@
 <template>
-  <v-alert color="#ff5252" class="white--text my-0">
+  <v-alert color="#ff5252" class="white--text my-0 mb-3">
     <v-row align="center" justify="center">
       <v-col cols="12" md="8" class="py-0 my-0 text-center">
-        Can you have
-        <span class="font-weight-bold expense-text px-2 px-md-3"
-          >{{ expensesLabelText }} <span class="caption">/year</span></span
-        >
-        professional related expenses to be granteed the 15% discount?
+        Non-habitual resident status?
       </v-col>
       <v-col class="py-0 my-0" cols="6" md="2">
         <v-row align="center" justify="center">
           <div class="mr-3">no</div>
           <v-switch
             class="white--text m-0"
-            v-model="hasExpenses"
+            v-model="hasRNH"
             label=""
             inset
             color="primary"
@@ -27,7 +23,7 @@
             <v-btn
               @click="
                 goToExternal(
-                  'https://www.e-konomista.pt/irs-para-quem-passa-recibos-verdes#h-quais-as-despesas-a-deduzir-no-irs-para-quem-passa-recibos-verdes'
+                  'https://www.e-konomista.pt/residente-nao-habitual/'
                 )
               "
               icon
@@ -45,22 +41,18 @@
 </template>
 
 <script>
-import { currency } from "@/utils.js";
 import { mapGetters } from "vuex";
 
 export default {
   computed: {
     ...mapGetters(["expenses"]),
-    hasExpenses: {
+    hasRNH: {
       get() {
-        return this.$store.state.hasExpenses;
+        return this.$store.state.hasRNH;
       },
       set(value) {
-        this.$store.commit("setHasExpenses", value);
+        this.$store.commit("setHasRNH", value);
       },
-    },
-    expensesLabelText() {
-      return currency(this.expenses);
     },
   },
   methods: {
@@ -70,10 +62,3 @@ export default {
   },
 };
 </script>
-
-<style scoped>
-.expense-text {
-  background-color: rgba(216, 25, 25, 0.8);
-  border-radius: 20px;
-}
-</style>

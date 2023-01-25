@@ -30,8 +30,9 @@
           </v-col>
         </v-row>
         <div v-if="valid">
-          <Alert v-if="expenses > 0" />
-          <v-row class="mt-3 mb-0 pb-o" align="center" justify="center">
+          <AlertExpenses v-if="expenses > 0" />
+          <AlertRNH v-if="taxIncomeNormal > 0.2" />
+          <v-row class="mb-0 pb-o" align="center" justify="center">
             <v-col class="mb-0 pb-0" cols="12" sm="6">
               <DisplayFreqToggler />
             </v-col>
@@ -98,7 +99,8 @@ import DisplayFreqToggler from "@/components/DisplayFreqToggler";
 import SSDiscount from "@/components/SSDiscount";
 import MainInfo from "@/components/MainInfo";
 import Chart from "@/components/Chart";
-import Alert from "@/components/Alert";
+import AlertExpenses from "@/components/AlertExpenses";
+import AlertRNH from "@/components/AlertRNH";
 import Details from "@/components/Details";
 import { mapGetters, mapState } from "vuex";
 
@@ -110,7 +112,8 @@ export default {
     DisplayFreqToggler,
     MainInfo,
     Chart,
-    Alert,
+    AlertExpenses,
+    AlertRNH,
     Details,
   },
   data() {
@@ -135,7 +138,14 @@ export default {
       "YEAR_BUSINESS_DAYS",
       "MONTH_BUSINESS_DAYS",
     ]),
-    ...mapGetters(["grossIncome", "irsPay", "ssPay", "netIncome", "expenses"]),
+    ...mapGetters([
+      "grossIncome",
+      "taxIncomeNormal",
+      "irsPay",
+      "ssPay",
+      "netIncome",
+      "expenses",
+    ]),
 
     datacollection() {
       return {
@@ -165,7 +175,7 @@ export default {
         },
         tooltips: {
           callbacks: {
-            label: function (tooltipItem, data) {
+            label: function(tooltipItem, data) {
               const val =
                 data.datasets[tooltipItem.datasetIndex].data[tooltipItem.index];
               return currency(val, 2);
@@ -211,7 +221,7 @@ export default {
   },
 };
 </script>
-<style >
+<style>
 .v-application {
   background-color: #f4f4f4 !important;
 }

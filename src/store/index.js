@@ -11,6 +11,7 @@ export default new Vuex.Store({
   state: {
     valid: false,
     income: null,
+    hasRNH: false,
     frequency: frequencyItems.YEAR,
     displayFreq: frequencyItems.MONTH,
     YEAR_BUSINESS_DAYS: 248,
@@ -24,6 +25,7 @@ export default new Vuex.Store({
       { id: 6, min: 36967, max: 80882, normalTax: 0.45, averageTax: 0.37613 },
       { id: 7, min: 80882, normalTax: 0.48 },
     ],
+    RNH_TAX: { normalTax: 0.2, averageTax: 0.2 },
     hasExpenses: true,
     nrMonthsDisplay: 12,
     colors: {
@@ -54,6 +56,10 @@ export default new Vuex.Store({
       };
     },
     specificDeductions(state, getters) {
+      if (state.hasRNH) {
+        return 0;
+      }
+
       return Math.max(
         4104,
         Math.min(getters.ssPay.year, 0.1 * getters.grossIncome.year)
@@ -74,12 +80,17 @@ export default new Vuex.Store({
     },
     taxRank(state, getters) {
       const taxableIncome = getters.taxableIncome;
-      return state.TAX_RANKS.filter((tr) => {
+      const value = state.TAX_RANKS.find((tr) => {
         if (tr.id == 7 && tr.min < taxableIncome) {
           return tr;
         }
         return tr.min < taxableIncome && tr.max >= taxableIncome;
-      })[0];
+      });
+
+      return {
+        ...value,
+        ...(state.hasRNH ? state.RNH_TAX : {}),
+      };
     },
     taxRankAvg(state, getters) {
       const taxRank = getters.taxRank;
@@ -87,7 +98,10 @@ export default new Vuex.Store({
         return taxRank;
       }
       const avgID = taxRank.id - 1;
-      return state.TAX_RANKS.filter((tr) => tr.id == avgID)[0];
+      return {
+        ...state.TAX_RANKS.find((tr) => tr.id == avgID),
+        ...(state.hasRNH ? state.RNH_TAX : {}),
+      };
     },
     taxIncomeAvg(state, getters) {
       if (getters.taxRank.id <= 1) {
@@ -175,6 +189,9 @@ export default new Vuex.Store({
     },
     setSsDiscount(state, ssDiscount) {
       state.ssDiscount = ssDiscount;
+    },
+    setHasRNH(state, hasRNH) {
+      state.hasRNH = hasRNH;
     },
   },
   actions: {
